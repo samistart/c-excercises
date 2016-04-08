@@ -10,18 +10,29 @@ SamiString::SamiString()
 SamiString::SamiString(const char *copyString)
 {
     mLength = strlen(copyString);
-    internalString = new char[mLength + 1];
-    memset(internalString, 0, mLength + 1);
-    memcpy(internalString, copyString, mLength);
+    internalString = std::unique_ptr<char[]>(new char[mLength+1]);
+    std::strcpy(internalString.get(), copyString);
 }
 
-SamiString::SamiString(const SamiString &samiString)
+SamiString::SamiString(const SamiString &ss)
 {
-    mLength = samiString.length();
-    internalString = new char[mLength + 1];
-    memset(internalString, 0, mLength + 1);
-    memcpy(internalString, samiString.internalString, mLength);
+    mLength = ss.length();
+    internalString = std::unique_ptr<char[]>(new char[mLength+1]);
+    std::strcpy(internalString.get(), ss.getData());
 }
+
+SamiString& SamiString::operator =(const SamiString & rhs)
+{
+    if (&rhs == this)
+    {
+        return *this;
+    }
+    mLength = rhs.length();
+    internalString.reset(new char[mLength+1]);
+    std::strcpy(internalString.get(), rhs.getData());
+    return *this;
+}
+
 
 int SamiString::length() const
 {
@@ -30,30 +41,43 @@ int SamiString::length() const
 
 bool SamiString::operator==(const SamiString& rhs) const
 {
-    if(this->length() != rhs.length())
-    {
-        return false;
-    }
-    for(int i = 0; i < this->length(); i++)
-    {
-        if(this->internalString[i] != rhs.internalString[i])
-        {
-            return false;
-        }
-    }
-    return true;
+    return (strcmp(internalString.get(), rhs.internalString.get()) == 0);
 }
 
 bool SamiString::operator <(const SamiString& rhs) const
 {
-    bool thisShorter = this->length() < rhs.length();
-    int shortestLength = thisShorter ? this->length() : rhs.length();
-    for(int i = 0; i < shortestLength; ++i)
-    {
-        if (this->internalString[i] != rhs.internalString[i])
-        {
-            return this->internalString[i] < rhs.internalString[i];
-        }
-    }
-    return thisShorter;
+    return (strcmp(internalString.get(), rhs.internalString.get()) < 0);
 }
+
+std::stringstream& operator<<(std::stringstream& ss, SamiString const &samiString)
+{
+    for(int i = 0; i < samiString.length(); ++i)
+    {
+        ss.put(samiString[i]);
+    }
+    return ss;
+}
+
+
+SamiString SamiString::operator+(const SamiString& rhs) const
+{   
+    SamiString res;
+    std::size_t newLength = rhs.length() + this->length();
+    res.internalString = std::unique_ptr<char[]>(new char[newLength]);
+    std::strcpy(res.internalString.get(), this->getData());
+    std::strcat(res.internalString.get(), rhs.getData());
+    return res;
+}
+
+void SamiString::operator+=(const SamiString& rhs)
+{
+    const char * tmp = internalString.get();
+    mLength += rhs.length();
+    internalString.reset(new char[mLength]);
+    std::strcpy(internalString.get(), tmp);
+    std::strcat(internalString.get(), rhs.getData());
+}
+
+
+
+

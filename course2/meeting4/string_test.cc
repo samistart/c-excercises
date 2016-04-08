@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "SamiString.h"
+
 template<typename StringType>
 void basic_test()
 {
@@ -70,7 +72,7 @@ void stream_output_operator()
 	
 	StringType s1 = "Test";
 	
-	stream << s1;
+    stream << s1;
 	
 	assert(stream.str() == "Test");
 }
@@ -81,11 +83,12 @@ void concatenation_operator()
 	StringType s1 = "aa";
 	StringType s2 = "bbb";
 	
-	// concatenation
-	StringType s3 = s1 + s2;
-	assert(s3 == "aabbb");
-	assert(s1 == "aa");
-	assert(s2 == "bbb");
+    // concatenation
+    StringType s3 = s1 + s2;
+    assert(s3 == "aabbb");
+    assert(s1 == "aa");
+    assert(s2 == "bbb");
+
 	
 	// appending
 	s3 += s1;
@@ -102,4 +105,10 @@ int main()
 	std::cout << "std::string tests passed" << std::endl;
 	
 	// TODO after implementing your string class, run the selected functions for your type here
+    basic_test<SamiString>();
+    basic_operators<SamiString>();
+    indexing_operator<SamiString>();
+    stream_output_operator<SamiString>();
+    concatenation_operator<SamiString>();
+    std::cout << "SamiString tests passed" << std::endl;
 }
