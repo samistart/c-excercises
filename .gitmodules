@@ -1,0 +1,3 @@
+[submodule "course2/meeting4/googletest"]
+	path = course2/meeting4/googletest
+	url = https://github.com/google/googletest.git
